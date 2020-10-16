@@ -13,11 +13,14 @@ import (
 
 func handleRequests() {
     myRouter := mux.NewRouter().StrictSlash(true)
-    myRouter.HandleFunc("/posts", AllPosts).Methods("GET")
-    myRouter.HandleFunc("/post", NewPost).Methods("POST")
-    myRouter.HandleFunc("/post/{id}", DeletePost).Methods("DELETE")
     //myRouter.HandleFunc("/users/{name}/{email}", updateUser).Methods("PUT")
     //myRouter.HandleFunc("/user", newUser).Methods("POST")
+    myRouter.HandleFunc("/users", AllUsers).Methods("GET")
+    myRouter.HandleFunc("/user/{id}", GetUser).Methods("GET")
+    myRouter.HandleFunc("/user", NewUser).Methods("POST")
+    myRouter.HandleFunc("/user/{id}", UpdateUser).Methods("POST")
+    myRouter.HandleFunc("/user/{id}", DeleteUser).Methods("DELETE")
+    myRouter.HandleFunc("/user/{id}/posts", AllUserPosts).Methods("GET")
     log.Fatal(http.ListenAndServe(":8081", myRouter))
 }
 
@@ -31,6 +34,8 @@ func initialMigration() {
     }
 
     db.AutoMigrate(&Post{})
+    db.AutoMigrate(&User{})
+    db.AutoMigrate(&UserPost{})
 }
 
 
