@@ -66,20 +66,6 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func AllUserPosts(w http.ResponseWriter, r *http.Request) {
-    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-    if err != nil {
-        fmt.Println(err.Error())
-        panic("failed to connect database")
-    }
-    vars := mux.Vars(r)
-    key := vars["id"]
-
-    var userPosts []UserPost
-    db.First(&userPosts, key)
-    json.NewEncoder(w).Encode(userPosts)
-}
-
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
     db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
     if err != nil {
@@ -106,3 +92,31 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
     db.Save(&userInDB)
     json.NewEncoder(w).Encode(&userInDB)
 }
+
+func AllUserPosts(w http.ResponseWriter, r *http.Request) {
+    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+    if err != nil {
+        fmt.Println(err.Error())
+        panic("failed to connect database")
+    }
+    vars := mux.Vars(r)
+    key := vars["id"]
+
+    var userPosts []UserPost
+    db.First(&userPosts, key)
+    json.NewEncoder(w).Encode(userPosts)
+}
+
+
+
+//func NewPost(w http.ResponseWriter, r *http.Request) {
+//    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+//    if err != nil {
+//        fmt.Println(err.Error())
+//        panic("failed to connect database")
+//    }
+//    vars := mux.Vars(r)
+//    userId := vars["id"]
+//
+//}
+
