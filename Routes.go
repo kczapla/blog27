@@ -45,7 +45,7 @@ var routes = Routes {
     },
     Route {
        "GetUser",
-       "POST",
+       "GET",
        "/users/{id}",
        GetUser,
     },
@@ -66,12 +66,6 @@ var routes = Routes {
         "DELETE",
         "/users/{id}",
         DeleteUser,
-    },
-    Route {
-        "AllUserPosts",
-        "GET",
-        "/users/{id}/posts",
-        AllUserPosts,
     },
 }
 

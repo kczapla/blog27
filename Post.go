@@ -7,6 +7,10 @@ import (
 
 type Post struct {
     gorm.Model
-    Title string `json:"Title"`
-    Content string `json:"Content"`
+    Title string `json:"title"`
+    Content string `json:"content"`
+    UserID uint `json:"userId"`
+    User User //`json:"user"`
 }
+
+type Posts []Post

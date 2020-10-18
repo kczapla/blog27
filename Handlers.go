@@ -82,8 +82,8 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
     var userInDB User
     db.First(&userInDB, key)
 
-    if userInRequest.Nickname != "" {
-        userInDB.Nickname = userInRequest.Nickname
+    if userInRequest.Name != "" {
+        userInDB.Name = userInRequest.Name
     }
 
     if userInRequest.Email != "" {
@@ -92,21 +92,6 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
     db.Save(&userInDB)
     json.NewEncoder(w).Encode(&userInDB)
 }
-
-func AllUserPosts(w http.ResponseWriter, r *http.Request) {
-    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-    if err != nil {
-        fmt.Println(err.Error())
-        panic("failed to connect database")
-    }
-    vars := mux.Vars(r)
-    key := vars["id"]
-
-    var userPosts []UserPost
-    db.First(&userPosts, key)
-    json.NewEncoder(w).Encode(userPosts)
-}
-
 
 
 //func NewPost(w http.ResponseWriter, r *http.Request) {

@@ -24,7 +24,6 @@ func initialMigration() {
 
     db.AutoMigrate(&Post{})
     db.AutoMigrate(&User{})
-    db.AutoMigrate(&UserPost{})
 }
 
 
