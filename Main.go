@@ -22,8 +22,7 @@ func initialMigration() {
         panic("failed to connect database")
     }
 
-    db.AutoMigrate(&Post{})
-    db.AutoMigrate(&User{})
+    db.AutoMigrate(&User{}, &Post{})
 }
 
 

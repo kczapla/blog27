@@ -8,5 +8,6 @@ type User struct {
     gorm.Model
     Name string `json:"name"`
     Email string `json:"email"`
-    //Posts Posts `json:"posts" gorm:"foreignKey:UserID"`
+    Posts []Post `json:"posts" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
+

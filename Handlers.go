@@ -94,14 +94,39 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 
-//func NewPost(w http.ResponseWriter, r *http.Request) {
-//    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-//    if err != nil {
-//        fmt.Println(err.Error())
-//        panic("failed to connect database")
-//    }
-//    vars := mux.Vars(r)
-//    userId := vars["id"]
-//
-//}
+func CreatePost(w http.ResponseWriter, r *http.Request) {
+    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+    if err != nil {
+        fmt.Println(err.Error())
+        panic("failed to connect database")
+    }
+
+    reqBody, _ := ioutil.ReadAll(r.Body)
+    var post Post
+
+    json.Unmarshal(reqBody, &post)
+
+    var user User
+    db.First(&user, post.UserID)
+    user.Posts = append(user.Posts, post)
+    db.Save(&user)
+    json.NewEncoder(w).Encode(post)
+}
+
+
+func GetPost(w http.ResponseWriter, r *http.Request) {
+    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+    if err != nil {
+        fmt.Println(err.Error())
+        panic("failed to connect database")
+    }
+
+    vars := mux.Vars(r)
+    key := vars["id"]
+
+    var post Post
+    db.First(&post, key)
+
+    json.NewEncoder(w).Encode(post)
+}
 

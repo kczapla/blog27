@@ -10,7 +10,5 @@ type Post struct {
     Title string `json:"title"`
     Content string `json:"content"`
     UserID uint `json:"userId"`
-    User User //`json:"user"`
 }
 
-type Posts []Post

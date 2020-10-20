@@ -67,5 +67,17 @@ var routes = Routes {
         "/users/{id}",
         DeleteUser,
     },
+    Route {
+        "CreatePost",
+        "POST",
+        "/posts",
+        CreatePost,
+    },
+    Route {
+        "GetPost",
+        "GET",
+        "/posts/{id}",
+        GetPost,
+    },
 }
 
