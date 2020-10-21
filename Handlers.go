@@ -62,8 +62,8 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     key := vars["id"]
 
+    fmt.Printf("id %v", key)
     db.Delete(&User{}, key)
-
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -169,3 +169,14 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(currentPost)
 }
 
+func DeletePost(w http.ResponseWriter, r *http.Request) {
+    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+    if err != nil {
+        fmt.Println(err.Error())
+        panic("failed to connect database")
+    }
+    vars := mux.Vars(r)
+    key := vars["id"]
+
+    db.Delete(&Post{}, key)
+}

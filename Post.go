@@ -9,6 +9,6 @@ type Post struct {
     gorm.Model
     Title string `json:"title"`
     Content string `json:"content"`
-    UserName string `json:"userName"`
+    UserID uint `json:"userId"`
 }
 

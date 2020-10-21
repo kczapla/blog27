@@ -91,5 +91,11 @@ var routes = Routes {
         "/posts/{id}",
         UpdatePost,
     },
+    Route {
+        "DeletePost",
+        "DELETE",
+        "/posts/{id}",
+        DeletePost,
+    },
 }
 
