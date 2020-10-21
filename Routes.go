@@ -57,7 +57,7 @@ var routes = Routes {
     },
     Route {
         "UpdateUser",
-        "POST",
+        "PATCH",
         "/users/{id}",
         UpdateUser,
     },
