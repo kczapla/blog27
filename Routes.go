@@ -85,5 +85,11 @@ var routes = Routes {
         "/posts",
         GetPosts,
     },
+    Route {
+        "UpdatePost",
+        "PATCH",
+        "/posts/{id}",
+        UpdatePost,
+    },
 }
 

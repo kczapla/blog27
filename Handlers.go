@@ -139,3 +139,33 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
     json.NewEncoder(w).Encode(post)
 }
+
+func UpdatePost(w http.ResponseWriter, r *http.Request) {
+    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+    if err != nil {
+        fmt.Println(err.Error())
+        panic("failed to connect database")
+    }
+
+    vars := mux.Vars(r)
+    key := vars["id"]
+    var currentPost Post
+    db.First(&currentPost, key)
+
+    reqBody, _ := ioutil.ReadAll(r.Body)
+    var incomingPost Post
+    json.Unmarshal(reqBody, &incomingPost)
+
+    if (incomingPost.Title != "") {
+        currentPost.Title = incomingPost.Title
+    }
+
+    if (incomingPost.Content != "") {
+        currentPost.Content = incomingPost.Content
+    }
+
+    db.Save(currentPost)
+
+    json.NewEncoder(w).Encode(currentPost)
+}
+
