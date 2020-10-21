@@ -106,10 +106,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
     json.Unmarshal(reqBody, &post)
 
-    var user User
-    db.First(&user, post.UserID)
-    user.Posts = append(user.Posts, post)
-    db.Save(&user)
+    db.Create(&post)
     json.NewEncoder(w).Encode(post)
 }
 
@@ -130,3 +127,15 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(post)
 }
 
+func GetPosts(w http.ResponseWriter, r *http.Request) {
+    db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+    if err != nil {
+        fmt.Println(err.Error())
+        panic("failed to connect database")
+    }
+
+    var post []Post
+    db.Find(&post)
+
+    json.NewEncoder(w).Encode(post)
+}
