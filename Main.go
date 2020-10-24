@@ -16,11 +16,16 @@ func handleRequests() {
         fmt.Println(err.Error())
         panic("failed to connect database")
     }
-    repository := NewRepository(db)
-    service := NewService(repository)
-    router := mux.NewRouter().StrictSlash(true)
+    postRepository := NewRepository(db)
+    postService := NewService(postRepository)
 
-    RegisterHandlers(service, router)
+    userRepository := NewUserRepository(db)
+    userService := NewUserService(userRepository)
+
+    router := mux.NewRouter().StrictSlash(true)
+    RegisterHandlers(postService, router)
+    RegisterUserHandlers(userService, router)
+
     log.Fatal(http.ListenAndServe(":8081", router))
 }
 

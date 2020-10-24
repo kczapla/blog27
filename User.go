@@ -11,3 +11,4 @@ type User struct {
     Posts []Post `json:"posts" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
+type Users []User
