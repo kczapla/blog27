@@ -12,3 +12,4 @@ type Post struct {
     UserID uint `json:"userId"`
 }
 
+type Posts []Post
