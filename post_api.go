@@ -72,31 +72,15 @@ func (res postResource) query(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Can't querry", http.StatusForbidden)
 		}
 		json.NewEncoder(w).Encode(posts)
-		return
 	}
 
-	posts, err := res.queryAllUserPosts(r.URL.Query().Get("userId"))
-	if err != nil {
-		http.Error(w, "Can't querry", http.StatusForbidden)
+	if r.URL.Query().Get("userId") != "" {
+		posts, err := res.queryAllUserPosts(r.URL.Query().Get("userId"))
+		if err != nil {
+			http.Error(w, "Can't querry", http.StatusForbidden)
+		}
+		json.NewEncoder(w).Encode(posts)
 	}
-	json.NewEncoder(w).Encode(posts)
-	// var posts Posts
-	// var err error
-
-	// if len(r.URL.Query()) == 0 {
-	// 	fmt.Printf("first")
-	// 	posts, err = res.queryAllPosts()
-	// } else if r.URL.Query().Get("userId") == "" {
-	// 	fmt.Printf("second")
-	// 	posts, err = res.queryAllUserPosts(r.URL.Query().Get("userId"))
-	// }
-
-	// if err != nil {
-	// 	http.Error(w, "Can't querry", http.StatusForbidden)
-	// 	return
-	// }
-
-	// json.NewEncoder(w).Encode(posts)
 }
 
 func (res postResource) queryAllPosts() (Posts, error) {
