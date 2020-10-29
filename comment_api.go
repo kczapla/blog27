@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 )
 
 func RegisterCommentHandlers(service CommentService, router *mux.Router) {
@@ -19,6 +20,11 @@ func RegisterCommentHandlers(service CommentService, router *mux.Router) {
 
 type commentResource struct {
 	service CommentService
+}
+
+type commentQuery struct {
+	UserID uint
+	PostID uint
 }
 
 func (res commentResource) get(w http.ResponseWriter, r *http.Request) {
@@ -64,10 +70,30 @@ func (res commentResource) update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (res commentResource) query(w http.ResponseWriter, r *http.Request) {
-	posts, err := res.service.Query()
-	if err != nil {
+	decoder := schema.NewDecoder()
+	var commentQuery commentQuery
+	decodeErr := decoder.Decode(&commentQuery, r.URL.Query())
+
+	if decodeErr != nil {
+		http.Error(w, "Can't convert querry", http.StatusForbidden)
+		return
+	}
+
+	var comments Comments
+	var queryErr error
+
+	if commentQuery.UserID != 0 {
+		comments, queryErr = res.service.QueryUserComments(commentQuery.UserID)
+	} else if commentQuery.PostID != 0 {
+		comments, queryErr = res.service.QueryPostComments(commentQuery.PostID)
+	} else {
+		comments, queryErr = res.service.QueryAll()
+	}
+
+	if queryErr != nil {
 		http.Error(w, "Can't querry", http.StatusForbidden)
 	}
 
-	json.NewEncoder(w).Encode(posts)
+	json.NewEncoder(w).Encode(comments)
+
 }

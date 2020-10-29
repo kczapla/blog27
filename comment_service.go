@@ -5,7 +5,9 @@ type CommentService interface {
 	Create(commentCreateRequest CommentCreateRequest) error
 	Delete(id string) error
 	Update(id string, commentUpdateRequest CommentUpdateRequest) error
-	Query() (Comments, error)
+	QueryAll() (Comments, error)
+	QueryUserComments(userID uint) (Comments, error)
+	QueryPostComments(postID uint) (Comments, error)
 }
 
 type commentService struct {
@@ -73,10 +75,26 @@ func (s commentService) Update(id string, commentUpdateRequest CommentUpdateRequ
 	return nil
 }
 
-func (s commentService) Query() (Comments, error) {
-	comment, err := s.repository.Query()
+func (s commentService) QueryAll() (Comments, error) {
+	comment, err := s.repository.Query(Comment{})
 	if err != nil {
 		return Comments{}, err
 	}
 	return comment, nil
+}
+
+func (s commentService) QueryUserComments(userID uint) (Comments, error) {
+	comments, err := s.repository.Query(Comment{UserID: userID})
+	if err != nil {
+		return Comments{}, err
+	}
+	return comments, nil
+}
+
+func (s commentService) QueryPostComments(postID uint) (Comments, error) {
+	comments, err := s.repository.Query(Comment{PostID: postID})
+	if err != nil {
+		return Comments{}, err
+	}
+	return comments, nil
 }
