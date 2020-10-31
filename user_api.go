@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 )
 
 func RegisterUserHandlers(service UserService, router *mux.Router) {
@@ -19,6 +20,10 @@ func RegisterUserHandlers(service UserService, router *mux.Router) {
 
 type userResource struct {
 	service UserService
+}
+
+type userQuery struct {
+	Name string
 }
 
 func (res userResource) get(w http.ResponseWriter, r *http.Request) {
@@ -64,20 +69,30 @@ func (res userResource) update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (res userResource) query(w http.ResponseWriter, r *http.Request) {
-	if len(r.URL.Query()) == 0 {
-		users, err := res.service.QueryAllUsers()
-		if err != nil {
-			users = Users{}
+	decoder := schema.NewDecoder()
+	var userQuery userQuery
+	decodeErr := decoder.Decode(&userQuery, r.URL.Query())
+
+	if decodeErr != nil {
+		http.Error(w, "Can't convert querry", http.StatusForbidden)
+		return
+	}
+
+	var users Users
+	var user User
+	var queryErr error
+
+	if userQuery.Name != "" {
+		user, queryErr = res.service.QueryUserByName(userQuery.Name)
+		if queryErr != nil {
+			http.Error(w, "Can't querry user", http.StatusForbidden)
+		}
+		json.NewEncoder(w).Encode(user)
+	} else {
+		users, queryErr = res.service.QueryAllUsers()
+		if queryErr != nil {
 			http.Error(w, "Can't querry", http.StatusForbidden)
 		}
 		json.NewEncoder(w).Encode(users)
-	}
-	if r.URL.Query().Get("name") != "" {
-		user, err := res.service.QueryUserByName(r.URL.Query().Get("name"))
-		if err != nil {
-			user = User{}
-			http.Error(w, "Can't querry", http.StatusForbidden)
-		}
-		json.NewEncoder(w).Encode(user)
 	}
 }
