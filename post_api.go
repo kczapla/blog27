@@ -2,12 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 )
 
 func RegisterHandlers(service Service, router *mux.Router) {
@@ -21,6 +20,10 @@ func RegisterHandlers(service Service, router *mux.Router) {
 
 type postResource struct {
 	service Service
+}
+
+type postQuery struct {
+	UserID uint
 }
 
 func (res postResource) get(w http.ResponseWriter, r *http.Request) {
@@ -66,34 +69,27 @@ func (res postResource) update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (res postResource) query(w http.ResponseWriter, r *http.Request) {
-	if len(r.URL.Query()) == 0 {
-		posts, err := res.queryAllPosts()
-		if err != nil {
-			http.Error(w, "Can't querry", http.StatusForbidden)
-		}
-		json.NewEncoder(w).Encode(posts)
+	decoder := schema.NewDecoder()
+	var postQuery postQuery
+	decodeErr := decoder.Decode(&postQuery, r.URL.Query())
+
+	if decodeErr != nil {
+		http.Error(w, "Can't convert querry", http.StatusForbidden)
+		return
 	}
 
-	if r.URL.Query().Get("userId") != "" {
-		posts, err := res.queryAllUserPosts(r.URL.Query().Get("userId"))
-		if err != nil {
-			http.Error(w, "Can't querry", http.StatusForbidden)
-		}
-		json.NewEncoder(w).Encode(posts)
-	}
-}
+	var posts Posts
+	var queryErr error
 
-func (res postResource) queryAllPosts() (Posts, error) {
-	posts, err := res.service.QueryAllPosts()
-	return posts, err
-}
-
-func (res postResource) queryAllUserPosts(userId string) (Posts, error) {
-	uid, conversionErr := strconv.ParseUint(userId, 10, 64)
-	if conversionErr != nil {
-		fmt.Println("error converting user id to int")
-		return Posts{}, conversionErr
+	if postQuery.UserID != 0 {
+		posts, queryErr = res.service.QueryAllUserPosts(postQuery.UserID)
+	} else {
+		posts, queryErr = res.service.QueryAllPosts()
 	}
 
-	return res.service.QueryAllUserPosts(uint(uid))
+	if queryErr != nil {
+		http.Error(w, "Can't querry", http.StatusForbidden)
+	}
+
+	json.NewEncoder(w).Encode(posts)
 }
