@@ -26,10 +26,14 @@ func handleRequests() {
 	commentRepository := NewCommentRepository(db)
 	commentService := NewCommentService(commentRepository)
 
+	tagRepository := NewTagRepository(db)
+	tagService := NewTagService(tagRepository)
+
 	router := mux.NewRouter().StrictSlash(true)
 	RegisterHandlers(postService, router)
 	RegisterUserHandlers(userService, router)
 	RegisterCommentHandlers(commentService, router)
+	RegisterTagHandlers(tagService, router)
 
 	log.Fatal(http.ListenAndServe(":8081", router))
 }
@@ -41,7 +45,7 @@ func initialMigration() {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&User{}, &Post{}, &Comment{})
+	db.AutoMigrate(&User{}, &Post{}, &Comment{}, &Tag{})
 }
 
 func main() {
