@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strconv"
+)
+
 type Service interface {
 	Get(id string) (Post, error)
 	Create(postCreateRequest PostCreateRequest) error
@@ -7,6 +11,7 @@ type Service interface {
 	Update(id string, postUpdateRequest PostUpdateRequest) error
 	QueryAllPosts() (Posts, error)
 	QueryAllUserPosts(userId uint) (Posts, error)
+	QueryPostTags(postId uint) (Tags, error)
 }
 
 type service struct {
@@ -93,4 +98,22 @@ func (s service) QueryAllUserPosts(userId uint) (Posts, error) {
 		return Posts{}, nil
 	}
 	return posts, nil
+}
+
+func (s service) QueryPostTags(postId uint) (Tags, error) {
+	post, postQueryError := s.repository.Get(strconv.FormatUint(uint64(postId), 10))
+	if postQueryError != nil {
+		return Tags{}, postQueryError
+	}
+
+	tags, err := s.repository.QueryTags(post)
+	if err != nil {
+		return Tags{}, err
+	}
+
+	if len(tags) == 0 {
+		return Tags{}, nil
+	}
+
+	return tags, nil
 }

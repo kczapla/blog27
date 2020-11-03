@@ -10,6 +10,7 @@ type Repository interface {
 	Delete(id string) error
 	Update(post Post) error
 	Query(post Post) (Posts, error)
+	QueryTags(post Post) (Tags, error)
 }
 
 type repository struct {
@@ -42,4 +43,10 @@ func (r repository) Query(post Post) (Posts, error) {
 	var posts Posts
 	result := r.db.Where(&post).Find(&posts)
 	return posts, result.Error
+}
+
+func (r repository) QueryTags(post Post) (Tags, error) {
+	var tags Tags
+	result := r.db.Model(&post).Association("Tags").Find(&tags)
+	return tags, result
 }

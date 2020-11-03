@@ -2,20 +2,26 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 )
 
 func RegisterHandlers(service Service, router *mux.Router) {
+	s := router.PathPrefix("/posts").Subrouter()
 	postResource := postResource{service}
-	router.HandleFunc("/posts/{id}", postResource.get).Methods("GET")
-	router.HandleFunc("/posts", postResource.create).Methods("POST")
-	router.HandleFunc("/posts/{id}", postResource.delete).Methods("DELETE")
-	router.HandleFunc("/posts/{id}", postResource.update).Methods("PATCH")
-	router.HandleFunc("/posts", postResource.query).Methods("GET")
+	s.HandleFunc("/", postResource.query).Methods("GET")
+	s.HandleFunc("/", postResource.create).Methods("POST")
+	s.HandleFunc("/{id}", postResource.get).Methods("GET")
+	s.HandleFunc("/{id}", postResource.delete).Methods("DELETE")
+	s.HandleFunc("/{id}", postResource.update).Methods("PATCH")
+	s.HandleFunc("/{id}", postResource.get).Methods("GET")
+	s.HandleFunc("/{id:[0-9]+}/tags", postResource.queryTags).Methods("GET")
 }
 
 type postResource struct {
@@ -29,6 +35,7 @@ type postQuery struct {
 func (res postResource) get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["id"]
+	fmt.Printf("GET")
 	post, _ := res.service.Get(key)
 	json.NewEncoder(w).Encode(post)
 }
@@ -55,6 +62,7 @@ func (res postResource) delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (res postResource) update(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("UPDATE")
 	vars := mux.Vars(r)
 	key := vars["id"]
 	reqBody, _ := ioutil.ReadAll(r.Body)
@@ -92,4 +100,16 @@ func (res postResource) query(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(posts)
+}
+
+func (res postResource) queryTags(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	key := vars["id"]
+	id, err := strconv.ParseUint(key, 10, 64)
+	if err != nil {
+		http.Error(w, "Can't convert passed id", http.StatusForbidden)
+		return
+	}
+	post, _ := res.service.QueryPostTags(uint(id))
+	json.NewEncoder(w).Encode(post)
 }
