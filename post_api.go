@@ -23,6 +23,7 @@ func RegisterHandlers(service Service, router *mux.Router) {
 	s.HandleFunc("/{id}", postResource.get).Methods("GET")
 	s.HandleFunc("/{id:[0-9]+}/tags", postResource.queryTags).Methods("GET")
 	s.HandleFunc("/{postId:[0-9]+}/tags/{tagId:[0-9]+}", postResource.addTag).Methods("POST")
+	s.HandleFunc("/{postId:[0-9]+}/tags/{tagId:[0-9]+}", postResource.deleteTag).Methods("DELETE")
 }
 
 type postResource struct {
@@ -129,5 +130,22 @@ func (res postResource) addTag(w http.ResponseWriter, r *http.Request) {
 
 	if addTagErr != nil {
 		http.Error(w, "Tag was not added", http.StatusForbidden)
+	}
+}
+
+func (res postResource) deleteTag(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postId, postIdConversionErr := strconv.ParseUint(vars["postId"], 10, 64)
+	tagId, tagIdConversionErr := strconv.ParseUint(vars["tagId"], 10, 64)
+
+	if postIdConversionErr != nil || tagIdConversionErr != nil {
+		http.Error(w, "Can not process passed ids", http.StatusForbidden)
+		return
+	}
+
+	deleteTagErr := res.service.DeleteTag(uint(postId), uint(tagId))
+
+	if deleteTagErr != nil {
+		http.Error(w, "Tag was not deleted", http.StatusForbidden)
 	}
 }

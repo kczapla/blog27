@@ -15,6 +15,7 @@ type Service interface {
 	QueryAllUserPosts(userId uint) (Posts, error)
 	QueryPostTags(postId uint) (Tags, error)
 	AddTag(postId uint, tagId uint) error
+	DeleteTag(postId uint, tagId uint) error
 }
 
 type service struct {
@@ -125,4 +126,10 @@ func (s service) AddTag(postId uint, tagId uint) error {
 	var post Post
 	post.ID = postId
 	return s.repository.AddTag(post, Tag{gorm.Model{ID: tagId}, ""})
+}
+
+func (s service) DeleteTag(postId uint, tagId uint) error {
+	var post Post
+	post.ID = postId
+	return s.repository.DeleteTag(post, Tag{gorm.Model{ID: tagId}, ""})
 }

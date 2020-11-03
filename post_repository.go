@@ -12,7 +12,7 @@ type Repository interface {
 	Query(post Post) (Posts, error)
 	QueryTags(post Post) (Tags, error)
 	AddTag(post Post, tag Tag) error
-	RemoveTag(post Post, tag Tag) error
+	DeleteTag(post Post, tag Tag) error
 }
 
 type repository struct {
@@ -57,6 +57,6 @@ func (r repository) AddTag(post Post, tag Tag) error {
 	return r.db.Model(&post).Association("Tags").Append(&tag)
 }
 
-func (r repository) RemoveTag(post Post, tag Tag) error {
+func (r repository) DeleteTag(post Post, tag Tag) error {
 	return r.db.Model(&post).Association("Tags").Delete(&tag)
 }
