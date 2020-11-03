@@ -11,6 +11,8 @@ type Repository interface {
 	Update(post Post) error
 	Query(post Post) (Posts, error)
 	QueryTags(post Post) (Tags, error)
+	AddTag(post Post, tag Tag) error
+	RemoveTag(post Post, tag Tag) error
 }
 
 type repository struct {
@@ -49,4 +51,12 @@ func (r repository) QueryTags(post Post) (Tags, error) {
 	var tags Tags
 	result := r.db.Model(&post).Association("Tags").Find(&tags)
 	return tags, result
+}
+
+func (r repository) AddTag(post Post, tag Tag) error {
+	return r.db.Model(&post).Association("Tags").Append(&tag)
+}
+
+func (r repository) RemoveTag(post Post, tag Tag) error {
+	return r.db.Model(&post).Association("Tags").Delete(&tag)
 }

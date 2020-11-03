@@ -2,6 +2,8 @@ package main
 
 import (
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type Service interface {
@@ -12,6 +14,7 @@ type Service interface {
 	QueryAllPosts() (Posts, error)
 	QueryAllUserPosts(userId uint) (Posts, error)
 	QueryPostTags(postId uint) (Tags, error)
+	AddTag(postId uint, tagId uint) error
 }
 
 type service struct {
@@ -116,4 +119,10 @@ func (s service) QueryPostTags(postId uint) (Tags, error) {
 	}
 
 	return tags, nil
+}
+
+func (s service) AddTag(postId uint, tagId uint) error {
+	var post Post
+	post.ID = postId
+	return s.repository.AddTag(post, Tag{gorm.Model{ID: tagId}, ""})
 }
