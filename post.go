@@ -10,7 +10,7 @@ type Post struct {
 	Content  string   `json:"content"`
 	UserID   uint     `json:"userId"`
 	Comments Comments `json:"posts" gorm:"constraint:OnDelete:SET NULL;"`
-	Tags     Tags     `json:"tags" gorm:"many2many:post_tags"`
+	Tags     []*Tag   `json:"tags" gorm:"many2many:post_tags"`
 }
 
 type Posts []Post

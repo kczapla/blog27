@@ -16,6 +16,7 @@ type Service interface {
 	QueryPostTags(postId uint) (Tags, error)
 	AddTag(postId uint, tagId uint) error
 	DeleteTag(postId uint, tagId uint) error
+	QueryPostsWithTags(tagsIds []uint) (Posts, error)
 }
 
 type service struct {
@@ -35,6 +36,10 @@ type PostCreateRequest struct {
 type PostUpdateRequest struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
+}
+
+type PostQueryWithTagsRequest struct {
+	TagIds []uint `json:"tagId"`
 }
 
 func (s service) Get(id string) (Post, error) {
@@ -125,11 +130,27 @@ func (s service) QueryPostTags(postId uint) (Tags, error) {
 func (s service) AddTag(postId uint, tagId uint) error {
 	var post Post
 	post.ID = postId
-	return s.repository.AddTag(post, Tag{gorm.Model{ID: tagId}, ""})
+	return s.repository.AddTag(post, Tag{gorm.Model{ID: tagId}, "", nil})
 }
 
 func (s service) DeleteTag(postId uint, tagId uint) error {
 	var post Post
 	post.ID = postId
-	return s.repository.DeleteTag(post, Tag{gorm.Model{ID: tagId}, ""})
+	return s.repository.DeleteTag(post, Tag{gorm.Model{ID: tagId}, "", nil})
+}
+
+func (s service) QueryPostsWithTags(tagsIds []uint) (Posts, error) {
+	var tags Tags
+	for _, tagId := range tagsIds {
+		var tag Tag
+		tag.ID = tagId
+		tags = append(tags, tag)
+	}
+
+	posts, err := s.repository.QueryPostsWith(tags)
+	if err != nil {
+		return Posts{}, err
+	}
+
+	return posts, nil
 }
